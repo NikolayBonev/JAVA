@@ -1,0 +1,16 @@
+
+public class Test {
+
+	public static void main(String[] args) {
+		
+		char[][] matrix = {{'i', 'v', 'a', 'n', 'i'}, 
+						   {'v', 'v', 's', 'v', 'n'}, 
+						   {'a', 'w', 'a', 'p', 'a'}, 
+						   {'n', 'n', 'q', 'n', 'v'}, 
+						   {'p', 'n', 'a', 'v', 'i'}};
+		
+		WordGame game = new WordGame("ivan", matrix);
+
+	}
+
+}

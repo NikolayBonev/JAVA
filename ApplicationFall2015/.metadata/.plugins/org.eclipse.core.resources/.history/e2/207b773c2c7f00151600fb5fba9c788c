@@ -1,0 +1,20 @@
+
+public class Test {
+	
+	public static void main(String[] args) {
+		
+//		try{
+//			Points point = new Points(0, 0, ">>><<<~>>>~^^^");
+//		
+//			point.findEndPoint();
+//			point.print();
+//		}catch(IllegalArgumentException e){
+//			System.err.println(e);
+//		}
+		
+		String path = ">><>";
+		
+		String newp = path.replace('>', '');
+		System.out.println(path);
+	}
+}

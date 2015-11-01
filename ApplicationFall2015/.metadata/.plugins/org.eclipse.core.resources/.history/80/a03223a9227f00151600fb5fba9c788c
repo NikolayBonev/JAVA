@@ -1,0 +1,257 @@
+
+public class WordGame {
+	
+	private int countHits;
+	private char[][] matrix;
+	private String word;
+	
+	public int getCountHits() {
+		return this.countHits;
+	}
+
+	public void setCountHits(int countHits) {
+		if(countHits >= 0){
+			this.countHits = countHits;
+		}
+	}
+
+	public char[][] getMatrix() {
+		return this.matrix;
+	}
+
+	public void setMatrix(char[][] matrix) throws IllegalArgumentException{
+		if(matrix != null){
+			this.matrix = matrix;
+		}else{
+			throw new IllegalArgumentException("Enter a matrix!");
+		}
+	}
+
+	public String getWord() {
+		return this.word;
+	}
+
+	public void setWord(String word) throws IllegalArgumentException {
+		if(word != null){
+			this.word = new String(word).toLowerCase();
+		}else{
+			throw new IllegalArgumentException("Enter a word!");
+		}
+	}
+
+	public WordGame(){
+		this("", new char[3][3]);
+	}
+	
+	public WordGame(String word, char[][] matrix) throws IllegalArgumentException{
+		setCountHits(0);
+		setMatrix(matrix);
+		setWord(word);
+	}
+	
+	public void wordFinder(){
+		
+		int index = 0;
+		for(int i = 0 ; i < this.matrix.length ; i++){
+			for(int j = 0 ; j < this.matrix[i].length ; j++){
+				
+				Character matrixChar = Character.toLowerCase(this.matrix[i][j]);
+				
+				if(matrixChar.equals(this.word.charAt(index))){
+					rowWordFinder(i, j, index);
+					colWordFinder(i, j, index);
+					mainCrossWordFinder(i, j, index);
+					secondaryCrossWordFinder(i, j, index);			
+				}
+			}
+		}
+		
+	}
+	
+	private void rowWordFinder(int x, int y, int index){
+		
+//		Searches the word from left to right
+		index = 1;
+		
+		if((this.matrix[x].length -1 -y) >= (this.word.length() -1)){		
+			for(int i = (y+1) ; i < this.matrix[x].length ; i++){
+				
+				Character matrixChar = Character.toLowerCase(this.matrix[x][i]);
+				
+				if () {
+					index++;
+				}else{
+					break;
+				}
+				
+				if(index == this.word.length()){
+					setCountHits(getCountHits() + 1);
+					break;
+				}
+			}
+		}
+
+		index = 1;
+	
+//		Searches the word from right to left
+	
+		if(y>= (this.word.length() -1)){
+			for(int i = (y-1) ; i >= 0 ; i--){
+				if (this.word.charAt(index) == this.matrix[x][i]) {
+					index++;
+				}else{
+					break;
+				}
+				
+				if(index == this.word.length()){
+					setCountHits(getCountHits() + 1);
+					break;
+				}
+			}
+		}
+	}
+	
+	private void colWordFinder(int x, int y, int index){
+//		Searches the word from top to bottom
+		
+		index = 1;
+		
+		if((this.matrix.length -1 - x) >= (this.word.length() -1)){
+			for(int i = (x+1) ; i < this.matrix[x].length ; i++){
+				if (this.word.charAt(index) == this.matrix[i][y]) {
+					index++;
+				}else{
+					break;
+				}
+				
+				if(index == this.word.length()){
+					setCountHits(getCountHits() + 1);
+					break;
+				}
+			}
+		}
+		
+		index = 1;
+		
+//		Searches the word from bottom to top
+		
+		if(x >= (this.word.length() -1)){
+			for(int i = (x-1) ; i >= 0 ; i--){
+				if (this.word.charAt(index) == this.matrix[i][y]) {
+					index++;
+				}else{
+					break;
+				}
+				
+				if(index == this.word.length()){
+					setCountHits(getCountHits() + 1);
+					break;
+				}
+			}
+		}
+	}
+	
+	private void mainCrossWordFinder(int x, int y, int index){
+
+//		Searches word across
+		
+		index = 1;
+		
+		if((this.matrix.length -1 - x) >= (this.word.length() -1) && (this.matrix[x].length -1 -y) >= (this.word.length() -1)){		
+			int i = x + 1;
+			int j = y + 1;
+			
+			while(true){			
+				if (this.word.charAt(index) == this.matrix[i][j]) {
+					index++;
+					i++;
+					j++;
+				}else{
+					break;
+				}
+				
+				if(index == this.word.length()){
+					setCountHits(getCountHits() + 1);
+					break;
+				}
+			}
+		}
+		
+		index = 1;
+		
+		if(x >= (this.word.length() -1) && y >= (this.word.length() -1)){			
+			int i = x - 1;
+			int j = y - 1;
+			
+			while(true){			
+				if (this.word.charAt(index) == this.matrix[i][j]) {
+					index++;
+					i--;
+					j--;
+				}else{
+					break;
+				}
+				
+				if(index == this.word.length()){
+					setCountHits(getCountHits() + 1);
+					break;
+				}
+			}
+		}
+	}
+	
+	private void secondaryCrossWordFinder(int x, int y, int index){
+		
+		index = 1;
+		
+//		Searches in secondary crosses for the given word from bottom left to top right
+		
+		if(x >= (this.word.length() -1) && (this.matrix[x].length -1 - y) >= (this.word.length() -1)){	
+			int i = x - 1;
+			int j = y + 1;
+			
+			while(true){	
+				if (this.word.charAt(index) == this.matrix[i][j]) {
+					index++;
+					i--;
+					j++;
+				}else{
+					break;
+				}
+				
+				if(index == this.word.length()){
+					setCountHits(getCountHits() + 1);
+					break;
+				}
+			}
+		}
+		
+		index = 1;
+		
+//		Searches in secondary crosses for the given word from top right to bottom left
+		
+		if(y >= (this.word.length() -1) && (this.matrix.length -1 - x ) >= (this.word.length() -1)){
+			int i = x + 1;
+			int j = y - 1;
+			
+			while(true){	
+				if (this.word.charAt(index) == this.matrix[i][j]) {
+					index++;
+					i++;
+					j--;
+				}else{
+					break;
+				}
+				
+				if(index == this.word.length()){
+					setCountHits(getCountHits() + 1);
+					break;
+				}
+			}
+		}	
+	}	
+	
+	public void printHits(){
+		System.out.println("Hits: " + getCountHits());
+	}
+}

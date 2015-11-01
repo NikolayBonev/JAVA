@@ -1,0 +1,236 @@
+package depedencies;
+
+import java.io.*;
+import java.util.*;
+
+public class DepedenciesResolving {
+	
+	private HashMap<String, ArrayList<String>> dataBasePackages;
+	private HashMap<String, ArrayList<String>> depedeciesProject;
+	private ArrayList<String> dir;
+	private String pathPackages;
+	private String pathDependencies;
+	private String pathInstalledModuls;
+	
+	public DepedenciesResolving(){
+		setDataBasePackages(new HashMap<String, ArrayList<String>>());
+		setDepedeciesProject(new HashMap<String, ArrayList<String>>());
+		searchInstalledModuls(pathInstalledModuls);
+		
+		setPathPackages("../DepedenciesResolving/depedencies/all_packages.json");
+		setPathDependencies("../DepedenciesResolving/depedencies/dependencies.json");
+		setPathInstalledModuls("../DepedenciesResolving/depedencies/installed_modules/");
+	}
+	
+	public DepedenciesResolving(String pathPackages, String pathDependencies, String pathInstalledModuls){
+		this();
+		
+		setPathPackages(pathPackages);
+		setPathDependencies(pathDependencies);
+		setPathInstalledModuls(pathInstalledModuls);
+	}
+	
+	private HashMap<String, ArrayList<String>> getDataBasePackages() {
+		return this.dataBasePackages;
+	}
+
+	private void setDataBasePackages(HashMap<String, ArrayList<String>> dataBasePackages) {
+		this.dataBasePackages = dataBasePackages;
+	}
+
+	private HashMap<String, ArrayList<String>> getDepedeciesProject() {
+		return this.depedeciesProject;
+	}
+
+	private void setDepedeciesProject(HashMap<String, ArrayList<String>> depedeciesProject) {
+		this.depedeciesProject = depedeciesProject;
+	}
+
+	private ArrayList<String> getDir() {
+		return this.dir;
+	}
+
+	private void setDir(ArrayList<String> dir) {
+		this.dir = dir;
+	}
+
+	public String getPathPackages() {
+		return this.pathPackages;
+	}
+
+	public void setPathPackages(String pathPackages) {
+		this.pathPackages = pathPackages;
+	}
+
+	public String getPathDependencies() {
+		return this.pathDependencies;
+	}
+
+	public void setPathDependencies(String pathDependencies) {
+		this.pathDependencies = pathDependencies;
+	}
+
+	public String getPathInstalledModuls() {
+		return this.pathInstalledModuls;
+	}
+
+	public void setPathInstalledModuls(String pathInstalledModuls) {
+		this.pathInstalledModuls = pathInstalledModuls;
+	}
+
+	public void installer() {
+		
+		loadDataBase();
+		depedenciesMaker();
+		installPackages(pathInstalledModuls);
+	}
+	
+	private void searchInstalledModuls(String pathInstalledModuls){
+		File file = new File(pathInstalledModuls);
+		
+		String[] files = file.list();
+		ArrayList<String> dir = new ArrayList<String>();
+		
+		for(String name : files){
+			if(new File(pathInstalledModuls+name).isDirectory()){
+				dir.add(name);
+			}
+		}
+		
+		setDir(dir);
+	}
+
+	private void installPackages(String pathInstalledModuls){
+		
+		Stack<String> bufferPackages = new Stack<String>();
+		
+		stackLoader("dependencies", bufferPackages, getDepedeciesProject());
+		
+		while(!bufferPackages.isEmpty()){
+			String depen = bufferPackages.pop();
+			
+			System.out.println("Instaling " + depen);
+			
+			boolean flag = stackLoader(depen, bufferPackages, getDataBasePackages());
+			
+			if(flag){
+				continue;
+			}	
+		}
+		
+		System.out.println("All done.");
+	}
+	
+	private boolean stackLoader(String searchedPackage, Stack<String> bufferPackages, HashMap<String, ArrayList<String>> packages){
+		ArrayList<String> packageBuffer= packages.get(searchedPackage);
+		
+		if(packageBuffer != null && packageBuffer.size() > 0){
+			if(!searchedPackage.equals("dependencies")){
+				
+				System.out.print("In order to install " + searchedPackage + " ,we need " + packageBuffer.get(0));
+				
+				for(int j = 1 ; j < packageBuffer.size() ; j++){
+					if(packageBuffer.size() -1 == j){
+						System.out.print(" and ");
+					}else{
+						System.out.print(", ");
+					}
+					
+					System.out.print(packageBuffer.get(j));
+				}
+				
+				System.out.print(".\n");
+			}
+			
+			for(int i = packageBuffer.size() - 1 ; i >= 0 ; i--){
+				if(!getDir().contains(packageBuffer.get(i))){
+					File dir = new File("../DepedenciesResolving/depedencies/installed_modules/" + packageBuffer.get(i));
+					dir.mkdir();
+					bufferPackages.push(packageBuffer.get(i));
+					
+				}else{
+					System.out.println(packageBuffer.get(i) + " is already installed.");
+				}
+			}	
+		}else{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private void loadDataBase(){
+		BufferedReader reader;
+		
+		try {
+			reader = new BufferedReader(new FileReader(getPathPackages()));
+
+			while (reader.ready()) {
+				String line = reader.readLine();
+				
+				if(line != "\n" && !line.contains("{") && !line.contains("}")){
+					packagesDataBaseMaker(line, getDataBasePackages());
+				}
+			}
+			
+			reader.close();
+		} catch (IOException e) {
+			System.out.println("Error: ");
+			System.out.println(e.getMessage());
+			System.exit(0);
+		}
+	}
+	
+	@SuppressWarnings("resource")
+	private void depedenciesMaker(){	
+		BufferedReader reader;
+		
+		try {
+			reader = new BufferedReader(new FileReader(getPathDependencies()));
+
+			while (reader.ready()) {
+				String line = reader.readLine();
+				
+				if(line == "\n" || line.contains("{") || line.contains("}")){
+					continue;				
+				}else if(line.contains("dependencies")){
+					packagesDataBaseMaker(line, getDepedeciesProject());
+						
+					if(this.depedeciesProject.containsKey("dependencies")){
+						return;
+					}
+				}
+			}
+			
+			reader.close();
+		} catch (IOException e) {
+			System.out.println("Error: ");
+			System.out.println(e.getMessage());
+			System.exit(0);
+		}
+	}
+	
+	private void packagesDataBaseMaker(String line, HashMap<String, ArrayList<String>> packageDataBase){
+		ArrayList<String> depedenceList;
+		
+		int spliterSemicolon = line.indexOf(":");
+		int spliterOpen = line.indexOf("[");
+		int spliterClose = line.indexOf("]");
+		
+		String newLine = line.substring(0, spliterSemicolon).replaceAll("[^a-zA-z]", "");
+		
+		String depedencies = line.substring(spliterOpen+1, spliterClose).replaceAll("[\"\\s]", "");
+		
+		String[] packages = depedencies.split(",");
+		
+		depedenceList = new ArrayList<String>();
+		
+		for(int j = 0 ; j < packages.length ; j++){
+			if(!packages[j].equals("") && !packages[j].equals(" ")){
+				depedenceList.add(packages[j]);
+			}
+		}
+		
+		packageDataBase.put(newLine, depedenceList);
+	}
+}

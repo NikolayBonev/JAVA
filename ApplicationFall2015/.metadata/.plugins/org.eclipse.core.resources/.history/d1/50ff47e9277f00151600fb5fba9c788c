@@ -1,0 +1,78 @@
+
+public class Points {
+
+	private int startDirectionX;
+	private int	startDirectionY;
+	private String path;
+	
+	public Points(){
+		this(0,0, "");
+	}
+	
+	public Points(int x, int y, String path){
+		setStartDirectionX(x);
+		setStartDirectionY(y);
+		setPath(path);
+	}
+	
+	public int getStartDirectionX() {
+		return this.startDirectionX;
+	}
+
+	public void setStartDirectionX(int startDirectionX) {
+		this.startDirectionX = startDirectionX;
+	}
+
+	public int getStartDirectionY() {
+		return this.startDirectionY;
+	}
+
+	public void setStartDirectionY(int startDirectionY) {
+		this.startDirectionY = startDirectionY;
+	}
+
+	public String getPath() {
+		return this.path;
+	}
+
+	public void setPath(String path) {
+		if(path != null){
+			this.path = path;
+		}else{
+			System.out.println("Enter correct path!");
+		}
+	}
+
+	public void findEndPoint(){
+		
+		boolean warpFlag = false;
+		
+		for(int i = 0 ; i < getPath().length() ; i++){
+			
+			if((getPath().charAt(i) == '>' && warpFlag == false) || (getPath().charAt(i) == '<' && warpFlag == true)){
+				setStartDirectionX(getStartDirectionX() + 1);
+			}else if((getPath().charAt(i) == '<'&& warpFlag == false) || (getPath().charAt(i) == '>' && warpFlag == true)){
+				setStartDirectionX(getStartDirectionX() - 1);
+			}else if((getPath().charAt(i) == 'v' && warpFlag == false) || (getPath().charAt(i) == '^' && warpFlag == true)){
+				setStartDirectionY(getStartDirectionY() + 1);
+			}else if((getPath().charAt(i) == '^' && warpFlag == false) || (getPath().charAt(i) == 'v' && warpFlag == true)){
+				setStartDirectionY(getStartDirectionY() - 1);
+			}else if(getPath().charAt(i) == '~'){
+				if(warpFlag == true){
+					warpFlag = false;
+				}else{
+					warpFlag = true;
+				}
+			}else{
+				throw new IllegalArgumentException("Invalid path!");
+			}
+		}
+		
+	}
+	
+	public void print(){
+		
+		System.out.println("End point is: (" + getStartDirectionX() + " ," + getStartDirectionY() + ")");
+	}
+
+}
